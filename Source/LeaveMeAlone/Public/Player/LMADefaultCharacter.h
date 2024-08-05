@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "LMAHealthComponent.h"
 #include "LMADefaultCharacter.generated.h"
 
 
@@ -30,6 +31,10 @@ protected:
 	UPROPERTY()
 	UDecalComponent* CurrentCursor = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+	ULMAHealthComponent* HealthComponent;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	UMaterialInterface* CursorMaterial = nullptr;
 
@@ -46,6 +51,32 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float CameraZoomSpeed = 100.0f;
 
+
+
+		UFUNCTION()
+	ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
+	// Состояние спринта
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sprint")
+	bool bIsSprinting;
+
+	// Выносливость
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprint")
+	float Stamina = 100;
+
+	// Максимальная выносливость
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprint")
+	float MaxStamina = 100;
+
+	// Затраты выносливости на спринт
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprint")
+	float SprintStaminaCost = 10;
+
+	// Восстановление выносливости
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprint")
+	float StaminaRecoveryRate = 10;
+
+
 private: 
 	float YRotation = -75.0f;
 	float ArmLength = 1400.0f;
@@ -57,6 +88,12 @@ protected :
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void ZoomCamera(float Value);
+
+	
+	// Методы
+	void StartSprinting();
+	void StopSprinting();
+	void UpdateStamina(float DeltaTime);
 
 public:	
 	virtual void Tick(float DeltaTime) override;

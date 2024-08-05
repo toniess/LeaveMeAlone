@@ -26,6 +26,8 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	Camera->SetFieldOfView(FOV);
 	Camera->bUsePawnControlRotation = false;
 
+	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -44,7 +46,7 @@ void ALMADefaultCharacter::BeginPlay()
 void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	UpdateStamina(DeltaTime);
 
 	// пока что отключаем дурацкое вращение камеры
 
@@ -73,6 +75,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("ZoomCamera", this, &ALMADefaultCharacter::ZoomCamera);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::StopSprinting);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
@@ -91,4 +95,36 @@ void ALMADefaultCharacter::ZoomCamera(float Value)
 	{
 		SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength - Value * CameraZoomSpeed, MinCameraDistance, MaxCameraDistance);
 	}
+}
+
+void ALMADefaultCharacter::StartSprinting()
+{
+	if (Stamina > 0)
+	{
+		bIsSprinting = true;
+	}
+}
+
+void ALMADefaultCharacter::StopSprinting()
+{
+	bIsSprinting = false;
+}
+
+void ALMADefaultCharacter::UpdateStamina(float DeltaTime)
+{
+	if (bIsSprinting)
+	{
+		Stamina -= SprintStaminaCost * DeltaTime;
+		if (Stamina < 0)
+			Stamina = 0;
+	}
+	else
+	{
+		Stamina += StaminaRecoveryRate * DeltaTime;
+		if (Stamina > MaxStamina)
+			Stamina = MaxStamina;
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("stamina %f"), Stamina);
+	UE_LOG(LogTemp, Display, TEXT("isSprint %i"), bIsSprinting);
 }
