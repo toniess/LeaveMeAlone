@@ -48,9 +48,7 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	UpdateStamina(DeltaTime);
 
-	// пока что отключаем дурацкое вращение камеры
-
-	/*
+	
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (PC)
 	{
@@ -64,7 +62,6 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 		}
 
 	}
-	*/
 
 }
 
@@ -99,7 +96,7 @@ void ALMADefaultCharacter::ZoomCamera(float Value)
 
 void ALMADefaultCharacter::StartSprinting()
 {
-	if (Stamina > 0)
+	if (Stamina > 0 && GetVelocity().Length() > 0)
 	{
 		bIsSprinting = true;
 	}
@@ -114,6 +111,11 @@ void ALMADefaultCharacter::UpdateStamina(float DeltaTime)
 {
 	if (bIsSprinting)
 	{
+		if (GetVelocity().Length() <= 0)
+		{
+			StopSprinting();
+			return;
+		}
 		Stamina -= SprintStaminaCost * DeltaTime;
 		if (Stamina < 0)
 			Stamina = 0;
