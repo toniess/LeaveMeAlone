@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "LMAHealthComponent.h"
+#include <Components/LMAWeaponComponent.h>
 #include "LMADefaultCharacter.generated.h"
 
 
@@ -51,9 +52,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float CameraZoomSpeed = 100.0f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	ULMAWeaponComponent* WeaponComponent;
 
 
-		UFUNCTION()
+	UFUNCTION()
 	ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 	// Состояние спринта
